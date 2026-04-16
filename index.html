@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmácia dos Pobres - Catálogo Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --farm-red: #e11d48; --farm-blue: #1e40af; }
+        .bg-farm-blue { background-color: var(--farm-blue); }
+        .text-farm-blue { color: var(--farm-blue); }
+        .bg-farm-red { background-color: var(--farm-red); }
+        .border-farm-blue { border-color: var(--farm-blue); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-20">
+
+    <header class="bg-farm-blue text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            
+            <div class="flex items-center gap-3 md:gap-4">
+                <img src="logo.jpg" alt="Logo" class="h-14 md:h-16 w-auto">
+                
+                <div class="flex flex-col justify-center">
+                    <h1 class="text-xl md:text-2xl font-black uppercase tracking-tight leading-tight">Farmácia dos Pobres</h1>
+                    <p class="text-[10px] md:text-xs italic opacity-90">O lugar certo para sua Saúde</p>
+                </div>
+            </div>
+
+            <button onclick="toggleCart()" class="relative bg-farm-red hover:scale-105 transition-transform px-4 py-2 rounded-full font-bold flex items-center gap-2 text-xs md:text-sm">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count" class="bg-white text-farm-blue rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="bg-yellow-100 text-yellow-800 text-center py-2 text-sm font-bold border-b border-yellow-200">
+        🚀 Entrega Grátis para pedidos acima de R$ 20,00!
+    </div>
+
+    <main class="container mx-auto px-4 py-8">
+        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            </div>
+    </main>
+
+    <div id="cart-sidebar" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden">
+        <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col">
+            <div class="p-6 bg-farm-blue text-white flex justify-between items-center">
+                <h2 class="text-xl font-bold uppercase tracking-widest">Meu Pedido</h2>
+                <button onclick="toggleCart()" class="text-3xl">&times;</button>
+            </div>
+            
+            <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-4"></div>
+
+            <div class="p-6 border-t bg-gray-50">
+                <div class="space-y-2 mb-4 text-sm">
+                    <div class="flex justify-between"><span>Subtotal:</span><span id="subtotal">R$ 0,00</span></div>
+                    <div class="flex justify-between font-bold"><span>Taxa de Entrega:</span><span id="delivery-fee">R$ 0,00</span></div>
+                    <div class="flex justify-between text-xl font-black text-farm-blue pt-2 border-t">
+                        <span>TOTAL:</span><span id="total-price">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <input type="text" id="cust-name" placeholder="Nome Completo" class="w-full p-2 border rounded outline-none focus:border-farm-blue">
+                    <input type="text" id="cust-address" placeholder="Endereço Completo para Entrega" class="w-full p-2 border rounded outline-none focus:border-farm-blue">
+                    
+                    <select id="payment-method" class="w-full p-2 border rounded bg-white outline-none focus:border-farm-blue">
+                        <option value="">Forma de Pagamento</option>
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="Pix">Pix</option>
+                        <option value="Cartão">Cartão</option>
+                        <option value="Link de Pagamento">Link de Pagamento</option>
+                    </select>
+
+                    <textarea id="order-obs" placeholder="Observações (opcional)" class="w-full p-2 border rounded outline-none focus:border-farm-blue" rows="2"></textarea>
+
+                    <button onclick="sendOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95">
+                        <i class="fab fa-whatsapp text-xl"></i> FINALIZAR NO WHATSAPP
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO DE IMAGEM E WHATSAPP
+        const ilustrativaUrl = "produto.jpg"; // Mantido local
+        const WHATSAPP_NUMBER = "5583996901718";
+
+        // SEUS PRODUTOS (Edite aqui)
+        const products = [
+            { code: "001", name: "Dipirona 500mg - 10 Comprimidos", price: 5.50 },
+            { code: "002", name: "Paracetamol 750mg - 20 Comprimidos", price: 12.90 },
+            { code: "003", name: "Vitamina C 1g Efervescente", price: 18.00 },
+            { code: "004", name: "Fralda Descartável G - 30 Unid.", price: 45.00 },
+            { code: "005", name: "Sabonete Líquido Neutro", price: 8.50 },
+            { code: "006", name: "Protetor Solar FPS 30", price: 32.00 }
+        ];
+
+        let cart = [];
+
+        window.onload = () => {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = products.map((p, index) => `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col group hover:border-farm-blue transition-colors">
+                    <img src="${ilustrativaUrl}" alt="Produto" class="w-full h-32 md:h-40 object-contain p-2">
+                    <div class="p-3 md:p-4 flex-grow border-t">
+                        <p class="text-[9px] font-bold text-gray-400">REF: ${p.code}</p>
+                        <h3 class="font-bold text-gray-800 text-xs md:text-sm mb-2 leading-tight h-8 overflow-hidden">${p.name}</h3>
+                        <p class="text-base md:text-lg font-black text-farm-blue mb-3">R$ ${p.price.toFixed(2).replace('.', ',')}</p>
+                        <div class="flex items-center gap-1 md:gap-2">
+                            <input type="number" id="qty-${index}" value="1" min="1" class="w-10 p-1 border rounded text-center text-xs font-bold outline-none focus:border-farm-blue">
+                            <button onclick="addToCart(${index})" class="flex-grow bg-farm-red text-white text-[9px] md:text-[10px] font-bold py-2 rounded hover:bg-red-700 transition-colors uppercase">
+                                Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        function addToCart(index) {
+            const product = products[index];
+            const qty = parseInt(document.getElementById(`qty-${index}`).value);
+            const existing = cart.find(item => item.code === product.code);
+            if (existing) { existing.qty += qty; } else { cart.push({ ...product, qty }); }
+            updateCart();
+            // Notificação simples
+            const btn = document.querySelectorAll('#product-grid button')[index];
+            btn.innerText = "Adicionado!"; btn.classList.remove('bg-farm-red'); btn.classList.add('bg-green-600');
+            setTimeout(() => { btn.innerText = "Adicionar"; btn.classList.remove('bg-green-600'); btn.classList.add('bg-farm-red'); }, 1000);
+        }
+
+        function updateCart() {
+            const container = document.getElementById('cart-items');
+            document.getElementById('cart-count').innerText = cart.reduce((acc, item) => acc + item.qty, 0);
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-10">Carrinho vazio</p>`;
+            } else {
+                container.innerHTML = cart.map((item, i) => `
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded border text-sm gap-2">
+                        <div class="flex items-center gap-2">
+                            <img src="${ilustrativaUrl}" class="w-8 h-8 object-contain">
+                            <div>
+                                <p class="font-bold text-gray-800 leading-tight">${item.name}</p>
+                                <p class="text-xs text-gray-500">${item.qty}x R$ ${item.price.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-farm-blue text-xs">R$ ${(item.qty * item.price).toFixed(2)}</span>
+                            <button onclick="removeItem(${i})" class="text-red-500 px-1 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            const subtotal = cart.reduce((acc, item) => acc + (item.qty * item.price), 0);
+            const delivery = (subtotal > 0 && subtotal < 20) ? 2.00 : 0.00;
+            const total = subtotal + delivery;
+            document.getElementById('subtotal').innerText = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
+            document.getElementById('delivery-fee').innerText = delivery === 0 ? "GRÁTIS" : `R$ ${delivery.toFixed(2).replace('.', ',')}`;
+            document.getElementById('total-price').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        function removeItem(i) { cart.splice(i, 1); updateCart(); }
+        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('hidden'); }
+
+        function sendOrder() {
+            const name = document.getElementById('cust-name').value;
+            const address = document.getElementById('cust-address').value;
+            const payment = document.getElementById('payment-method').value;
+            const obs = document.getElementById('order-obs').value;
+
+            if (cart.length === 0) return alert("Adicione produtos!");
+            if (!name || !address || !payment) return alert("Preencha Nome, Endereço e Pagamento!");
+
+            let msg = `*NOVO PEDIDO - FARMÁCIA DOS POBRES*\n\n`;
+            msg += `👤 *Cliente:* ${name}\n📍 *Entrega:* ${address}\n💳 *Pagamento:* ${payment}\n`;
+            if(obs) msg += `📝 *Obs:* ${obs}\n`;
+            msg += `\n*ITENS:*\n`;
+            cart.forEach(item => { msg += `- ${item.qty}x ${item.name} (R$ ${(item.qty * item.price).toFixed(2)})\n`; });
+
+            const subtotal = cart.reduce((acc, item) => acc + (item.qty * item.price), 0);
+            const delivery = subtotal >= 20 ? 0 : 2;
+            msg += `\n*Subtotal:* R$ ${subtotal.toFixed(2)}\n*Entrega:* ${delivery === 0 ? "GRÁTIS" : "R$ 2,00"}\n*Total: R$ ${(subtotal + delivery).toFixed(2)}*`;
+
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
