@@ -78,8 +78,8 @@
                 <div class="space-y-2">
                     <input type="text" id="cust-name" placeholder="Seu Nome Completo" class="w-full p-2 border rounded outline-none focus:border-farm-blue">
                     <input type="text" id="cust-address" placeholder="Endereço de Entrega" class="w-full p-2 border rounded outline-none focus:border-farm-blue">
-                    <input type="text" id="cust-address" placeholder="Observação (Precisa de Troco)" class="w-full p-2 border rounded outline-none focus:border-farm-blue">
-                                            
+                    <input type="text" id="cust-obs" placeholder="Observação (Troco, ponto de referência...)" class="w-full p-2 border rounded outline-none focus:border-farm-blue">
+                                                            
                     <select id="payment-method" class="w-full p-2 border rounded bg-white outline-none focus:border-farm-blue">
                         <option value="Pix">Pix</option>
                         <option value="Dinheiro">Dinheiro</option>
@@ -172,7 +172,6 @@
             if (existing) { existing.qty += 1; } else { cart.push({ ...product, qty: 1 }); }
             updateCart();
             
-            // Feedback visual rápido
             const cartBtn = document.querySelector('button[onclick="toggleCart()"]');
             cartBtn.classList.add('scale-110');
             setTimeout(() => cartBtn.classList.remove('scale-110'), 200);
@@ -200,7 +199,6 @@
 
         function calculateTotals() {
             const subtotal = cart.reduce((acc, item) => acc + (item.qty * item.price), 0);
-            // REGRA: Se subtotal > 0 e < 20, taxa é 2.00. Se >= 20, taxa é 0.00.
             const deliveryFee = (subtotal > 0 && subtotal < 20) ? 2.00 : 0.00;
             const total = subtotal + deliveryFee;
 
@@ -212,10 +210,12 @@
         function removeItem(i) { cart.splice(i, 1); updateCart(); }
         function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('hidden'); }
 
+        // FUNÇÃO ATUALIZADA PARA ENVIAR OBSERVAÇÃO
         function sendOrder() {
             const name = document.getElementById('cust-name').value;
             const addr = document.getElementById('cust-address').value;
             const pay = document.getElementById('payment-method').value;
+            const obs = document.getElementById('cust-obs').value; // PEGA A OBSERVAÇÃO
             
             if(!name || !addr || cart.length === 0) return alert("Por favor, preencha nome e endereço!");
 
@@ -224,7 +224,12 @@
             const total = subtotal + deliveryFee;
 
             let msg = `*NOVO PEDIDO - FARMÁCIA DOS POBRES*\n\n`;
-            msg += `👤 *Cliente:* ${name}\n📍 *Endereço:* ${addr}\n💳 *Pagamento:* ${pay}\n\n*ITENS:*\n`;
+            msg += `👤 *Cliente:* ${name}\n📍 *Endereço:* ${addr}\n`;
+            
+            // ADICIONA A OBSERVAÇÃO SE ELA NÃO ESTIVER VAZIA
+            if(obs) { msg += `📝 *Obs:* ${obs}\n`; }
+            
+            msg += `💳 *Pagamento:* ${pay}\n\n*ITENS:*\n`;
             
             cart.forEach(item => {
                 msg += `- ${item.qty}x ${item.name} [REF: ${item.code}] (R$ ${(item.qty * item.price).toLocaleString('pt-br', {minimumFractionDigits: 2})})\n`;
