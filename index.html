@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmácia dos Pobres - Catálogo</title>
+    <title>Farmácia dos Pobres - Loja Virtual</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,14 +21,13 @@
         /* Estilo customizado para o Carrossel */
         .swiper { width: 100%; height: auto; border-radius: 12px; margin-top: 10px; }
         .swiper-slide img { 
-            width: 100%; 
-            height: auto; 
-            object-fit: cover; 
-            aspect-ratio: 16 / 7; /* Formato ideal de banner */
-            display: block;
+            width: 100%; height: auto; object-fit: cover; aspect-ratio: 16 / 7; display: block;
         }
-        /* Cor das bolinhas do carrossel */
         .swiper-pagination-bullet-active { background: var(--farm-red) !important; }
+        
+        /* Transição suave entre páginas */
+        .page-view { transition: opacity 0.3s ease; }
+        .hidden-view { display: none; opacity: 0; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen pb-20">
@@ -36,7 +35,7 @@
     <header class="bg-farm-blue text-white shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
                     <img src="logo.jpg" alt="Logo" class="h-12 w-auto">
                     <div>
                         <h1 class="text-lg font-black leading-tight">Farmácia dos Pobres</h1>
@@ -48,7 +47,7 @@
                     <span id="cart-count" class="font-bold">0</span>
                 </button>
             </div>
-            <div class="relative text-gray-800">
+            <div id="search-container" class="relative text-gray-800">
                 <input type="text" id="search-input" oninput="filterProducts()" placeholder="Pesquisar entre 6.000+ produtos..." 
                        class="w-full p-3 rounded-lg shadow-inner outline-none focus:ring-2 focus:ring-farm-red">
                 <i class="fas fa-search absolute right-4 top-4 text-gray-400"></i>
@@ -56,35 +55,43 @@
         </div>
     </header>
 
-    <!-- FRASE DE FRETE GRÁTIS -->
-    <div class="bg-yellow-100 text-yellow-800 text-center py-2 text-sm font-bold border-b border-yellow-200">
-        🚀 Entrega grátis em pedidos a partir de R$ 20,00!
-    </div>
+    <!-- VISTA DA HOME (LISTA DE PRODUTOS) -->
+    <div id="view-home" class="page-view">
+        <div class="bg-yellow-100 text-yellow-800 text-center py-2 text-sm font-bold border-b border-yellow-200">
+            🚀 Entrega grátis em pedidos a partir de R$ 20,00!
+        </div>
 
-    <!-- CARROSSEL DE BANNERS (INSERIDO AQUI) -->
-    <div class="container mx-auto px-4">
-        <div class="swiper mySwiper shadow-md">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide"><img src="banner1.jpg" alt="Promoção 1"></div>
-                <div class="swiper-slide"><img src="banner2.jpg" alt="Promoção 2"></div>
-                <div class="swiper-slide"><img src="banner3.jpg" alt="Promoção 3"></div>
+        <div class="container mx-auto px-4">
+            <div class="swiper mySwiper shadow-md">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="banner1.jpg" alt="Promoção 1"></div>
+                    <div class="swiper-slide"><img src="banner2.jpg" alt="Promoção 2"></div>
+                    <div class="swiper-slide"><img src="banner3.jpg" alt="Promoção 3"></div>
+                </div>
+                <div class="swiper-pagination"></div>
             </div>
-            <!-- Bolinhas de navegação -->
-            <div class="swiper-pagination"></div>
+        </div>
+
+        <main class="container mx-auto px-4 py-6">
+            <div id="loading" class="text-center py-10 font-bold text-gray-500">
+                <i class="fas fa-spinner fa-spin"></i> Carregando estoque atualizado...
+            </div>
+            <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+            <div id="no-results" class="hidden text-center py-20 text-gray-500">Nenhum produto encontrado.</div>
+        </main>
+    </div>
+
+    <!-- VISTA DE DETALHES DO PRODUTO -->
+    <div id="view-details" class="page-view hidden-view container mx-auto px-4 py-6">
+        <button onclick="navigate('home')" class="mb-4 text-farm-blue font-bold flex items-center gap-2">
+            <i class="fas fa-arrow-left"></i> Voltar para a lista
+        </button>
+        <div id="product-detail-content" class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex flex-col md:flex-row gap-8">
+            <!-- Conteúdo injetado via JS -->
         </div>
     </div>
 
-    <main class="container mx-auto px-4 py-6">
-        <div id="loading" class="text-center py-10 font-bold text-gray-500">
-            <i class="fas fa-spinner fa-spin"></i> Carregando estoque atualizado...
-        </div>
-        <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
-        <div id="no-results" class="hidden text-center py-20 text-gray-500">
-            Nenhum produto encontrado.
-        </div>
-    </main>
-
-    <!-- O RESTANTE DO SEU CÓDIGO (CARRINHO E SIDEBAR) PERMANECE O MESMO -->
+    <!-- CARRINHO (SIDEBAR) -->
     <div id="cart-sidebar" class="fixed inset-0 bg-black/50 z-[60] hidden">
         <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white flex flex-col shadow-2xl">
             <div class="p-6 bg-farm-blue text-white flex justify-between items-center">
@@ -117,24 +124,72 @@
     </div>
 
     <script>
-        // Inicialização do Carrossel (Swiper)
-        const swiper = new Swiper(".mySwiper", {
-            loop: true,
-            autoplay: {
-                delay: 4000,
-                disableOnInteraction: false,
-            },
-            pagination: {
-                el: ".swiper-pagination",
-                clickable: true,
-            },
-        });
-
         const CSV_URL = 'estoque.csv'; 
         const WHATSAPP_NUMBER = "5583996901718";
         let allProducts = [];
         let cart = [];
 
+        // --- SISTEMA DE NAVEGAÇÃO ---
+        function navigate(page, prodCode = null) {
+            const homeView = document.getElementById('view-home');
+            const detailsView = document.getElementById('view-details');
+            const searchBar = document.getElementById('search-container');
+
+            if (page === 'home') {
+                homeView.classList.remove('hidden-view');
+                detailsView.classList.add('hidden-view');
+                searchBar.classList.remove('hidden');
+                window.history.pushState({}, '', '/');
+            } else if (page === 'details' && prodCode) {
+                homeView.classList.add('hidden-view');
+                detailsView.classList.remove('hidden-view');
+                searchBar.classList.add('hidden');
+                showProductDetails(prodCode);
+                window.history.pushState({code: prodCode}, '', `#detalhes/${prodCode}`);
+            }
+            window.scrollTo(0,0);
+        }
+
+        window.onpopstate = function(event) {
+            if (event.state && event.state.code) { navigate('details', event.state.code); } 
+            else { navigate('home'); }
+        };
+
+        function showProductDetails(code) {
+            const p = allProducts.find(item => item.code == code);
+            const content = document.getElementById('product-detail-content');
+            if(!p) { content.innerHTML = "Produto não encontrado."; return; }
+
+            content.innerHTML = `
+                <div class="w-full md:w-1/2">
+                    <img src="produto.jpg" class="w-full h-auto rounded-xl shadow-inner border">
+                </div>
+                <div class="w-full md:w-1/2 space-y-4">
+                    <p class="text-sm text-gray-400 font-bold">CÓDIGO REF: ${p.code}</p>
+                    <h2 class="text-2xl font-black text-gray-800">${p.name}</h2>
+                    <p class="text-3xl text-farm-blue font-black">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
+                    <div class="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
+                        <i class="fas fa-truck"></i> Disponível para entrega imediata em toda a região.
+                    </div>
+                    <div class="flex flex-col gap-3 pt-4">
+                        <button onclick="addToCart('${p.code}')" class="w-full bg-farm-red text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-all">
+                            ADICIONAR AO CARRINHO
+                        </button>
+                        <button onclick="shareProduct('${p.code}', '${p.name}')" class="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                            <i class="fas fa-share-alt"></i> COMPARTILHAR PRODUTO
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function shareProduct(code, name) {
+            const url = `${window.location.origin}${window.location.pathname}#detalhes/${code}`;
+            const text = `Confira este produto na Farmácia dos Pobres: ${name}\nVeja aqui: ${url}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        // --- CARREGAMENTO DO ESTOQUE (IGUAL AO SEU) ---
         function loadInventory() {
             Papa.parse(CSV_URL, {
                 download: true,
@@ -160,6 +215,13 @@
 
                     document.getElementById('loading').classList.add('hidden');
                     renderProducts(allProducts);
+                    
+                    // Checa se já entrou com link de detalhe
+                    const hash = window.location.hash;
+                    if(hash.includes('#detalhes/')) {
+                        const code = hash.split('/')[1];
+                        navigate('details', code);
+                    }
                 }
             });
         }
@@ -170,22 +232,23 @@
             grid.innerHTML = '';
             if(list.length === 0) { noRes.classList.remove('hidden'); return; }
             noRes.classList.add('hidden');
-            const displayLimit = list.slice(0, 100);
-            grid.innerHTML = displayLimit.map((p) => `
+            
+            grid.innerHTML = list.slice(0, 100).map((p) => `
                 <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex flex-col justify-between hover:border-farm-blue transition-all">
-                    <img src="produto.jpg" class="w-full h-24 object-contain mb-2 opacity-80">
-                    <div>
+                    <div onclick="navigate('details', '${p.code}')" class="cursor-pointer">
+                        <img src="produto.jpg" class="w-full h-24 object-contain mb-2 opacity-80">
                         <p class="text-[9px] text-gray-400 font-bold">REF: ${p.code}</p>
                         <h3 class="text-[11px] font-bold text-gray-700 leading-tight mb-2 h-8 overflow-hidden">${p.name}</h3>
                         <p class="text-farm-blue font-black text-sm mb-2">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
                     </div>
                     <button onclick="addToCart('${p.code}')" class="w-full bg-farm-red text-white text-[10px] py-2 rounded font-bold uppercase active:scale-95 transition-all">
-                        Adicionar
+                        Comprar
                     </button>
                 </div>
             `).join('');
         }
 
+        // --- SISTEMA DE CARRINHO E WHATSAPP (SEUS ORIGINAIS MANTIDOS) ---
         function filterProducts() {
             const term = document.getElementById('search-input').value.toLowerCase();
             const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || p.code.includes(term));
@@ -193,9 +256,9 @@
         }
 
         function addToCart(code) {
-            const product = allProducts.find(p => p.code === code);
+            const product = allProducts.find(p => p.code == code);
             if (!product) return;
-            const existing = cart.find(item => item.code === code);
+            const existing = cart.find(item => item.code == code);
             if (existing) { existing.qty += 1; } else { cart.push({ ...product, qty: 1 }); }
             updateCart();
             const cartBtn = document.querySelector('button[onclick="toggleCart()"]');
@@ -256,6 +319,12 @@
             msg += `*TOTAL FINAL: R$ ${total.toLocaleString('pt-br', {minimumFractionDigits: 2})}*`;
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         }
+
+        // Inicialização do Carrossel (Swiper)
+        new Swiper(".mySwiper", {
+            loop: true, autoplay: { delay: 4000, disableOnInteraction: false },
+            pagination: { el: ".swiper-pagination", clickable: true },
+        });
 
         window.onload = loadInventory;
     </script>
