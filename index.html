@@ -433,7 +433,42 @@
             pagination: { el: ".swiper-pagination", clickable: true },
         });
 
-        window.onload = loadInventory;
+        // Função para fechar o popup na tela
+        function fecharPopup() {
+            document.getElementById('popup-inicial').classList.add('hidden');
+        }
+
+        // Modificamos a inicialização para carregar o estoque E abrir o popup
+        window.onload = function() {
+            loadInventory(); // Carrega o estoque do CSV normalmente
+            
+            // Abre o popup na tela do cliente após 1 segundo da página carregar
+            setTimeout(() => {
+                document.getElementById('popup-inicial').classList.remove('hidden');
+            }, 1000); 
+        };
     </script>
+<!-- POPUP DE AVISO INICIAL (ENTREGA PARA TODO O BRASIL) -->
+    <div id="popup-inicial" class="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center p-4 hidden">
+        <div class="relative bg-white rounded-2xl overflow-hidden max-w-[320px] w-full shadow-2xl animate-fade-in">
+            
+            <!-- Botão de Fechar X (No topo direito da imagem) -->
+            <button onclick="fecharPopup()" class="absolute top-2 right-2 bg-black/60 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg z-10 active:scale-90 transition-transform">
+                &times;
+            </button>
+            
+            <!-- Imagem do Popup -->
+            <!-- FORMATO IDEAL PARA MOBILE: Crie uma arte vertical (ex: 800x1200 px ou proporção 2:3) -->
+            <!-- Nome sugerido para sua foto: popup-aviso.jpg -->
+            <img src="popup-aviso.jpg" alt="Aviso Importante" class="w-full h-auto block">
+            
+            <!-- Botão de Ação Opcional (Caso queira que o cliente clique e vá direto pro Whats) -->
+            <div class="p-3 bg-gray-50 text-center border-t">
+                <button onclick="fecharPopup()" class="w-full bg-farm-blue text-white text-xs py-2.5 rounded-lg font-bold uppercase tracking-wider active:scale-95 transition-all">
+                    Entendi e Quero Navegar
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
