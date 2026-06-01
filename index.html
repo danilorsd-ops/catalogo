@@ -367,9 +367,26 @@
             const existing = cart.find(item => item.code == code);
             if (existing) { existing.qty += 1; } else { cart.push({ ...product, qty: 1 }); }
             updateCart();
+            
+            // Efeito de pulo no botão do carrinho
             const cartBtn = document.querySelector('button[onclick="toggleCart()"]');
             cartBtn.classList.add('scale-110');
             setTimeout(() => cartBtn.classList.remove('scale-110'), 200);
+
+            // --- MOSTRAR AVISO FLUTUANTE ---
+            const toast = document.getElementById('toast-aviso');
+            // Altera o texto para mostrar o nome do produto que foi adicionado
+            toast.querySelector('span').innerText = `Adicionado: ${product.name.substring(0, 25)}...`;
+            
+            // Faz o aviso aparecer subindo suavemente
+            toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            // Some com o aviso depois de 2 segundos
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
+            }, 2000);
         }
 
         function updateCart() {
@@ -469,6 +486,11 @@
                 </button>
             </div>
         </div>
+    </div>
+<!-- AVISO FLUTUANTE DE PRODUTO ADICIONADO -->
+    <div id="toast-aviso" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-[300] transition-all duration-300 transform translate-y-[-20px] opacity-0 pointer-events-none">
+        <i class="fas fa-check-circle text-green-400 text-lg"></i>
+        <span class="text-sm font-bold tracking-wide">Produto adicionado ao carrinho!</span>
     </div>
 </body>
 </html>
