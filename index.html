@@ -1,18 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <!-- Configurações de SEO Avançadas -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Título ideal para buscas locais (Máx 60 caracteres) -->
+    <title>Farmácia dos Pobres | Farmácia e Drogaria em Pombal - PB</title>
+    
+    <!-- Descrição que aparece no Google (Máx 160 caracteres) -->
+    <meta name="description" content="Compre remédios, medicamentos e perfumaria na Farmácia dos Pobres em Pombal - PB. Faça seu pedido online pelo nosso catálogo e receba em casa com entrega rápida!">
+    
+    <!-- Palavras-chave para motores de busca menores -->
+    <meta name="keywords" content="farmacia em pombal, drogaria pombal pb, remedios online pombal, farmacia dos pobres pombal, entrega de remedio pombal">
+    
+    <!-- Tags Open Graph (Para ficar bonito quando compartilhar o link no WhatsApp/Facebook) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://farmaciadospobres.com.br/">
+    <meta property="og:title" content="Farmácia dos Pobres | Catálogo Online em Pombal - PB">
+    <meta property="og:description" content="Peça seus medicamentos e produtos de higiene sem sair de casa. Entrega rápida em Pombal.">
+    <meta property="og:image" content="https://farmaciadospobres.com.br/logo.jpg">
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SD3TCFYR13"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-SD3TCFYR13');
     </script>
     
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farmácia dos Pobres - Loja Virtual</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
@@ -26,15 +42,9 @@
         .bg-farm-blue { background-color: var(--farm-blue); }
         .text-farm-blue { color: var(--farm-blue); }
         .bg-farm-red { background-color: var(--farm-red); }
-
-        /* Estilo customizado para o Carrossel */
         .swiper { width: 100%; height: auto; border-radius: 12px; margin-top: 10px; }
-        .swiper-slide img { 
-            width: 100%; height: auto; object-fit: cover; aspect-ratio: 16 / 7; display: block;
-        }
+        .swiper-slide img { width: 100%; height: auto; object-fit: cover; aspect-ratio: 16 / 7; display: block; }
         .swiper-pagination-bullet-active { background: var(--farm-red) !important; }
-        
-        /* Transição suave entre páginas */
         .page-view { transition: opacity 0.3s ease; }
         .hidden-view { display: none; opacity: 0; }
     </style>
@@ -44,68 +54,72 @@
     <header class="bg-farm-blue text-white shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4 py-3">
             <div class="flex justify-between items-center mb-3">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')">
-                    <img src="logo.jpg" alt="Logo" class="h-12 w-auto">
+                <!-- Mudado para uma tag <nav> semântica para ajudar os robôs -->
+                <nav class="flex items-center gap-3 cursor-pointer" onclick="navigate('home')" aria-label="Menu Principal">
+                    <img src="logo.jpg" alt="Logo Oficial da Farmácia dos Pobres em Pombal" class="h-12 w-auto">
                     <div>
+                        <!-- H1 Principal otimizado para os robôs do Google -->
                         <h1 class="text-lg font-black leading-tight">Farmácia dos Pobres</h1>
-                        <p class="text-[10px] italic opacity-80">O lugar certo para sua Saúde</p>
+                        <p class="text-[10px] italic opacity-80">O lugar certo para sua Saúde em Pombal - PB</p>
                     </div>
-                </div>
-                <button onclick="toggleCart()" class="relative bg-farm-red p-2 rounded-full px-4 flex items-center gap-2 transition-transform active:scale-95">
-                    <i class="fas fa-shopping-cart"></i>
+                </nav>
+                <button onclick="toggleCart()" class="relative bg-farm-red p-2 rounded-full px-4 flex items-center gap-2 transition-transform active:scale-95" aria-label="Ver Carrinho">
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                     <span id="cart-count" class="font-bold">0</span>
                 </button>
             </div>
             <div id="search-container" class="relative text-gray-800">
+                <!-- Label invisível para acessibilidade e SEO -->
+                <label for="search-input" class="sr-only">Pesquisar medicamentos e produtos</label>
                 <input type="text" id="search-input" oninput="filterProducts()" placeholder="Pesquisar entre 6.000+ produtos..." 
                        class="w-full p-3 rounded-lg shadow-inner outline-none focus:ring-2 focus:ring-farm-red">
-                <i class="fas fa-search absolute right-4 top-4 text-gray-400"></i>
+                <i class="fas fa-search absolute right-4 top-4 text-gray-400" aria-hidden="true"></i>
             </div>
         </div>
     </header>
 
     <div id="view-home" class="page-view">
         <div class="bg-yellow-100 text-yellow-800 text-center py-2 text-sm font-bold border-b border-yellow-200">
-            🚀 Entrega grátis em pedidos a partir de R$ 20,00!
+            🚀 Entrega grátis em pedidos a partir de R$ 20,00 em Pombal!
         </div>
 
         <div class="container mx-auto px-4">
             <div class="swiper mySwiper shadow-md">
                 <div class="swiper-wrapper">
-                    <div class="swiper-slide"><img src="banner1.jpg" alt="Promoção 1"></div>
-                    <div class="swiper-slide"><img src="banner2.jpg" alt="Promoção 2"></div>
-                    <div class="swiper-slide"><img src="banner3.jpg" alt="Promoção 3"></div>
+                    <div class="swiper-slide"><img src="banner1.jpg" alt="Campanha promocional de medicamentos"></div>
+                    <div class="swiper-slide"><img src="banner2.jpg" alt="Ofertas especiais em perfumaria e higiene"></div>
+                    <div class="swiper-slide"><img src="banner3.jpg" alt="Descontos exclusivos Farmácia dos Pobres"></div>
                 </div>
                 <div class="swiper-pagination"></div>
             </div>
         </div>
 
         <div id="destaques-container" class="container mx-auto px-4 mt-6 hidden">
+            <!-- H2 Otimizado com texto legível por robôs -->
             <h2 class="text-sm font-black text-farm-blue uppercase tracking-wider mb-3 flex items-center gap-2">
-                <i class="fas fa-star text-yellow-500"></i> Ofertas em Destaque
+                <i class="fas fa-star text-yellow-500" aria-hidden="true"></i> Principais Ofertas e Medicamentos em Destaque
             </h2>
-            <div id="destaques-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                </div>
+            <div id="destaques-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200"></div>
         </div>
 
         <main class="container mx-auto px-4 py-6">
-            <h2 class="text-sm font-black text-gray-500 uppercase tracking-wider mb-3">Todos os Produtos</h2>
+            <h2 class="text-sm font-black text-gray-500 uppercase tracking-wider mb-3">Catálogo Completo de Produtos</h2>
             <div id="loading" class="text-center py-10 font-bold text-gray-500">
-                <i class="fas fa-spinner fa-spin"></i> Carregando estoque atualizado...
+                <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Carregando estoque atualizado...
             </div>
             <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
-            <div id="no-results" class="hidden text-center py-20 text-gray-500">Nenhum produto encontrado.</div>
+            <div id="no-results" class="hidden text-center py-20 text-gray-500">Nenhum produto encontrado na busca.</div>
         </main>
 
         <footer class="bg-white border-t border-gray-200 py-8 mt-12">
             <div class="container mx-auto px-4 text-center space-y-6">
                 
                 <div class="flex justify-center gap-6 text-2xl">
-                    <a href="https://www.facebook.com/farmaciadospobre00" target="_blank" class="text-blue-600 hover:opacity-80 transition-opacity">
-                        <i class="fab fa-facebook"></i>
+                    <a href="https://www.facebook.com/farmaciadospobre00" target="_blank" rel="noopener" class="text-blue-600 hover:opacity-80 transition-opacity" aria-label="Visite nosso Facebook">
+                        <i class="fab fa-facebook" aria-hidden="true"></i>
                     </a>
-                    <a href="https://www.instagram.com/farmaciadospobres00/" target="_blank" class="text-pink-600 hover:opacity-80 transition-opacity">
-                        <i class="fab fa-instagram"></i>
+                    <a href="https://www.instagram.com/farmaciadospobres00/" target="_blank" rel="noopener" class="text-pink-600 hover:opacity-80 transition-opacity" aria-label="Visite nosso Instagram">
+                        <i class="fab fa-instagram" aria-hidden="true"></i>
                     </a>
                 </div>
 
@@ -136,17 +150,16 @@
 
     <div id="view-details" class="page-view hidden-view container mx-auto px-4 py-6">
         <button onclick="navigate('home')" class="mb-4 text-farm-blue font-bold flex items-center gap-2">
-            <i class="fas fa-arrow-left"></i> Voltar para a lista
+            <i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar para a lista
         </button>
-        <div id="product-detail-content" class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex flex-col md:flex-row gap-8">
-            </div>
+        <div id="product-detail-content" class="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 flex flex-col md:flex-row gap-8"></div>
     </div>
 
     <div id="cart-sidebar" class="fixed inset-0 bg-black/50 z-[60] hidden">
         <div class="absolute right-0 top-0 h-full w-full max-w-md bg-white flex flex-col shadow-2xl">
             <div class="p-6 bg-farm-blue text-white flex justify-between items-center">
                 <h2 class="font-bold uppercase tracking-widest">Meu Pedido</h2>
-                <button onclick="toggleCart()" class="text-2xl">&times;</button>
+                <button onclick="toggleCart()" class="text-2xl" aria-label="Fechar Carrinho">&times;</button>
             </div>
             <div id="cart-items" class="flex-grow overflow-y-auto p-4 space-y-3"></div>
             <div class="p-6 border-t bg-gray-50 space-y-4">
@@ -166,7 +179,7 @@
                         <option value="Link de Pagamento">Link de Pagamento</option>
                     </select>
                     <button onclick="sendOrder()" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-95">
-                        <i class="fab fa-whatsapp text-xl"></i> FINALIZAR NO WHATSAPP
+                        <i class="fab fa-whatsapp text-xl" aria-hidden="true"></i> FINALIZAR NO WHATSAPP
                     </button>
                 </div>
             </div>
@@ -174,13 +187,35 @@
     </div>
 
     <a href="https://wa.me/5583996901718?text=Olá! Estava navegando no site e gostaria de tirar uma dúvida." 
-       target="_blank" 
-       class="fixed bottom-24 right-6 bg-green-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl z-[55] transition-transform active:scale-90 hover:bg-green-600 border-2 border-white">
-        <i class="fab fa-whatsapp"></i>
+       target="_blank" rel="noopener"
+       class="fixed bottom-24 right-6 bg-green-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl z-[55] transition-transform active:scale-90 hover:bg-green-600 border-2 border-white"
+       aria-label="Fale conosco pelo WhatsApp">
+        <i class="fab fa-whatsapp" aria-hidden="true"></i>
         <span class="absolute right-16 bg-white text-green-600 text-[10px] font-bold py-1 px-3 rounded-lg shadow-md whitespace-nowrap border border-green-100">
             Precisa de ajuda?
         </span>
     </a>
+
+    <!-- AVISO FLUTUANTE DE PRODUTO ADICIONADO (Melhoria de UX) -->
+    <div id="toast-aviso" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-[300] transition-all duration-300 transform translate-y-[-20px] opacity-0 pointer-events-none">
+        <i class="fas fa-check-circle text-green-400 text-lg" aria-hidden="true"></i>
+        <span class="text-sm font-bold tracking-wide">Produto adicionado ao carrinho!</span>
+    </div>
+
+    <!-- POPUP DE AVISO INICIAL -->
+    <div id="popup-inicial" class="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center p-4 hidden">
+        <div class="relative bg-white rounded-2xl overflow-hidden max-w-[320px] w-full shadow-2xl animate-fade-in">
+            <button onclick="fecharPopup()" class="absolute top-2 right-2 bg-black/60 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg z-10 active:scale-90 transition-transform" aria-label="Fechar Aviso">
+                &times;
+            </button>
+            <img src="popup-aviso.jpg" alt="Aviso Importante sobre Entregas em todo o Brasil" class="w-full h-auto block">
+            <div class="p-3 bg-gray-50 text-center border-t">
+                <button onclick="fecharPopup()" class="w-full bg-farm-blue text-white text-xs py-2.5 rounded-lg font-bold uppercase tracking-wider active:scale-95 transition-all">
+                    Entendi e Quero Navegar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const CSV_URL = 'estoque.csv'; 
@@ -188,10 +223,8 @@
         let allProducts = [];
         let cart = [];
 
-        // 🌟 LISTA DE PRODUTOS EM DESTAQUE (Mude os códigos dentro do array quando quiser alterar a vitrine)
-        const CODIGOS_DESTAQUES = ['35814', '36945', '16377', '1328', '10496', '27607'];
+        const CODIGOS_DESTAQUES = ['35814', '36945', '34959', '1328', '10496', '27607'];
 
-        // --- SISTEMA DE NAVEGAÇÃO ---
         function navigate(page, prodCode = null) {
             const homeView = document.getElementById('view-home');
             const detailsView = document.getElementById('view-details');
@@ -224,7 +257,7 @@
 
             content.innerHTML = `
                 <div class="w-full md:w-1/2">
-                    <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" class="w-full h-auto rounded-xl shadow-inner border">
+                    <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" alt="${p.name}" class="w-full h-auto rounded-xl shadow-inner border">
                 </div>
                 <div class="w-full md:w-1/2 space-y-4">
                     <p class="text-sm text-gray-400 font-bold">CÓDIGO REF: ${p.code}</p>
@@ -251,7 +284,6 @@
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
 
-        // --- CARREGAMENTO DO ESTOQUE ---
         function loadInventory() {
             Papa.parse(CSV_URL, {
                 download: true,
@@ -276,12 +308,9 @@
                     }).filter(p => p.stock > 0 && p.name !== "Sem nome");
 
                     document.getElementById('loading').classList.add('hidden');
-                    
-                    // Renderiza as duas vitrines
                     renderHighlights();
                     renderProducts(allProducts);
                     
-                    // Checa Deep Link de detalhes
                     const hash = window.location.hash;
                     if(hash.includes('#detalhes/')) {
                         const code = hash.split('/')[1];
@@ -291,11 +320,9 @@
             });
         }
 
-        // --- RENDERIZAR PRODUTOS EM DESTAQUE ---
         function renderHighlights() {
             const grid = document.getElementById('destaques-grid');
             const container = document.getElementById('destaques-container');
-            
             const filteredHighlights = allProducts.filter(p => CODIGOS_DESTAQUES.includes(p.code));
             
             if (filteredHighlights.length === 0) {
@@ -310,7 +337,7 @@
                         <i class="fas fa-star"></i> Top
                     </span>
                     <div onclick="navigate('details', '${p.code}')" class="cursor-pointer pt-3">
-                        <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" class="w-full h-20 object-contain mb-1 opacity-95">
+                        <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" alt="${p.name}" class="w-full h-20 object-contain mb-1 opacity-95">
                         <p class="text-[8px] text-gray-400 font-bold">REF: ${p.code}</p>
                         <h3 class="text-[10px] font-extrabold text-gray-700 leading-tight mb-1 h-8 overflow-hidden">${p.name}</h3>
                         <p class="text-farm-blue font-black text-xs mb-1">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
@@ -322,7 +349,6 @@
             `).join('');
         }
 
-        // --- RENDERIZAR LISTA GERAL ---
         function renderProducts(list) {
             const grid = document.getElementById('product-grid');
             const noRes = document.getElementById('no-results');
@@ -333,7 +359,7 @@
             grid.innerHTML = list.slice(0, 100).map((p) => `
                 <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex flex-col justify-between hover:border-farm-blue transition-all">
                     <div onclick="navigate('details', '${p.code}')" class="cursor-pointer">
-                        <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" class="w-full h-24 object-contain mb-2 opacity-80">
+                        <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" alt="${p.name}" class="w-full h-24 object-contain mb-2 opacity-80">
                         <p class="text-[9px] text-gray-400 font-bold">REF: ${p.code}</p>
                         <h3 class="text-[11px] font-bold text-gray-700 leading-tight mb-2 h-8 overflow-hidden">${p.name}</h3>
                         <p class="text-farm-blue font-black text-sm mb-2">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
@@ -345,7 +371,6 @@
             `).join('');
         }
 
-        // --- FILTRAGEM ---
         function filterProducts() {
             const term = document.getElementById('search-input').value.toLowerCase();
             const containerHighlights = document.getElementById('destaques-container');
@@ -360,7 +385,6 @@
             renderProducts(filtered);
         }
 
-        // --- CARRINHO ---
         function addToCart(code) {
             const product = allProducts.find(p => p.code == code);
             if (!product) return;
@@ -368,21 +392,16 @@
             if (existing) { existing.qty += 1; } else { cart.push({ ...product, qty: 1 }); }
             updateCart();
             
-            // Efeito de pulo no botão do carrinho
             const cartBtn = document.querySelector('button[onclick="toggleCart()"]');
             cartBtn.classList.add('scale-110');
             setTimeout(() => cartBtn.classList.remove('scale-110'), 200);
 
-            // --- MOSTRAR AVISO FLUTUANTE ---
+            // Toast feedback visual
             const toast = document.getElementById('toast-aviso');
-            // Altera o texto para mostrar o nome do produto que foi adicionado
             toast.querySelector('span').innerText = `Adicionado: ${product.name.substring(0, 25)}...`;
-            
-            // Faz o aviso aparecer subindo suavemente
             toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
             toast.classList.add('opacity-100', 'translate-y-0');
 
-            // Some com o aviso depois de 2 segundos
             setTimeout(() => {
                 toast.classList.remove('opacity-100', 'translate-y-0');
                 toast.classList.add('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
@@ -420,7 +439,6 @@
         function removeItem(i) { cart.splice(i, 1); updateCart(); }
         function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('hidden'); }
 
-        // --- ENVIAR PEDIDO ---
         function sendOrder() {
             const name = document.getElementById('cust-name').value;
             const addr = document.getElementById('cust-address').value;
@@ -444,53 +462,21 @@
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // Inicialização do Carrossel (Swiper)
         new Swiper(".mySwiper", {
             loop: true, autoplay: { delay: 4000, disableOnInteraction: false },
             pagination: { el: ".swiper-pagination", clickable: true },
         });
 
-        // Função para fechar o popup na tela
         function fecharPopup() {
             document.getElementById('popup-inicial').classList.add('hidden');
         }
 
-        // Modificamos a inicialização para carregar o estoque E abrir o popup
         window.onload = function() {
-            loadInventory(); // Carrega o estoque do CSV normalmente
-            
-            // Abre o popup na tela do cliente após 1 segundo da página carregar
+            loadInventory();
             setTimeout(() => {
                 document.getElementById('popup-inicial').classList.remove('hidden');
             }, 1000); 
         };
     </script>
-<!-- POPUP DE AVISO INICIAL (ENTREGA PARA TODO O BRASIL) -->
-    <div id="popup-inicial" class="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center p-4 hidden">
-        <div class="relative bg-white rounded-2xl overflow-hidden max-w-[320px] w-full shadow-2xl animate-fade-in">
-            
-            <!-- Botão de Fechar X (No topo direito da imagem) -->
-            <button onclick="fecharPopup()" class="absolute top-2 right-2 bg-black/60 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg z-10 active:scale-90 transition-transform">
-                &times;
-            </button>
-            
-            <!-- Imagem do Popup -->
-            <!-- FORMATO IDEAL PARA MOBILE: Crie uma arte vertical (ex: 800x1200 px ou proporção 2:3) -->
-            <!-- Nome sugerido para sua foto: popup-aviso.jpg -->
-            <img src="popup-aviso.jpg" alt="Aviso Importante" class="w-full h-auto block">
-            
-            <!-- Botão de Ação Opcional (Caso queira que o cliente clique e vá direto pro Whats) -->
-            <div class="p-3 bg-gray-50 text-center border-t">
-                <button onclick="fecharPopup()" class="w-full bg-farm-blue text-white text-xs py-2.5 rounded-lg font-bold uppercase tracking-wider active:scale-95 transition-all">
-                    Entendi e Quero Navegar
-                </button>
-            </div>
-        </div>
-    </div>
-<!-- AVISO FLUTUANTE DE PRODUTO ADICIONADO -->
-    <div id="toast-aviso" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-[300] transition-all duration-300 transform translate-y-[-20px] opacity-0 pointer-events-none">
-        <i class="fas fa-check-circle text-green-400 text-lg"></i>
-        <span class="text-sm font-bold tracking-wide">Produto adicionado ao carrinho!</span>
-    </div>
 </body>
 </html>
