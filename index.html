@@ -473,6 +473,20 @@
 
         window.onload = function() {
             loadInventory();
+            
+            // NOVO: Verifica se existe uma busca na URL do site
+            const urlParams = new URLSearchParams(window.location.search);
+            const buscaParam = urlParams.get('busca');
+            if (buscaParam) {
+                setTimeout(() => {
+                    const inputBusca = document.getElementById('search-input');
+                    if (inputBusca) {
+                        inputBusca.value = buscaParam;
+                        filterProducts(); // Executa a busca automaticamente
+                    }
+                }, 500); // Aguarda o estoque carregar antes de filtrar
+            }
+
             setTimeout(() => {
                 document.getElementById('popup-inicial').classList.remove('hidden');
             }, 1000); 
