@@ -547,12 +547,12 @@ function atualizarStatusFuncionamento() {
     // REGRA 3: Atendimento com Horário Especial (Ex: Feriado até 12:00)
     if (HOJE_HORARIO_ESPECIAL && estaAbertoHora) {
         banner.className = "bg-yellow-100 text-yellow-900 border-yellow-300 text-center py-2.5 px-4 text-xs font-bold border-b";
-        banner.innerHTML = `⚠️ <span class="uppercase tracking-wide">Atendimento Especial</span> • Abertos hoje até às 12:00 (Meio-dia)!`;
+        banner.innerHTML = `⚠️ <span class="uppercase tracking-wide">Atendimento Especial</span> • Abertos hoje até às 12:00 Frete Grátis a partir de R$ 20,00! !`;
     }
     // REGRA 4: Funcionamento Normal em Aberto
     else if (estaAbertoHora) {
         banner.className = "bg-green-100 text-green-900 border-green-200 text-center py-2.5 px-4 text-xs font-bold border-b";
-        banner.innerHTML = `🟢 <span class="uppercase tracking-wide">Aberto Agora</span> • Fazendo entregas em Pombal | Frete Grátis acima de R$ 20,00!`;
+        banner.innerHTML = `🟢 <span class="uppercase tracking-wide">Aberto Agora</span> • Fazendo entregas em Pombal | Frete Grátis a partir de R$ 20,00!`;
     } 
     // REGRA 5: Fora do Horário (Loja Fechada)
     else {
