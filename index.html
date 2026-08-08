@@ -24,7 +24,7 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-SD3TCFYR13"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
+      function gtag( ){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-SD3TCFYR13');
     </script>
@@ -39,7 +39,7 @@
 
     <style>
         :root { --farm-red: #e11d48; --farm-blue: #1e40af; }
-        .bg-farm-blue { background-color: var(--farm-blue); }
+        .bg-farm-blue { background-color: var(--farm-blue ); }
         .text-farm-blue { color: var(--farm-blue); }
         .bg-farm-red { background-color: var(--farm-red); }
         .swiper { width: 100%; height: auto; border-radius: 12px; margin-top: 10px; }
@@ -78,10 +78,12 @@
         </div>
     </header>
 
-    <!-- BANNER DINÂMICO DE STATUS DE FUNCIONAMENTO E ENTREGA -->
-<div id="status-loja-banner" class="text-center py-2.5 px-4 text-xs font-bold transition-all border-b">
-    <!-- O JavaScript vai preencher a mensagem e a cor aqui automaticamente -->
-</div>
+    <!-- INÍCIO DA VIEW HOME (CONTAINER QUE FALTAVA) -->
+    <div id="view-home" class="page-view">
+        <!-- BANNER DINÂMICO DE STATUS DE FUNCIONAMENTO E ENTREGA -->
+        <div id="status-loja-banner" class="text-center py-2.5 px-4 text-xs font-bold transition-all border-b">
+            <!-- O JavaScript vai preencher a mensagem e a cor aqui automaticamente -->
+        </div>
 
         <div class="container mx-auto px-4">
             <div class="swiper mySwiper shadow-md">
@@ -136,7 +138,7 @@
                 <div class="text-[10px] text-gray-400 space-y-1">
                     <p class="font-bold text-gray-600">Razão Social: J. J. G. COMERCIO VAREJISTA DE PRODUTOS FARMACEUTICOS LTDA | Nome Fantasia: Farmácia dos Pobres</p>
                     <p>CNPJ: 03.166.237/0001-35 | Rua Tenente Aurélio Cavalcante, 34 - Centro, Pombal - PB, CEP: 58840-000</p>
-                    <p>Horário de Funcionamento: Segunda à Domingo | Telefone: (83) 99690-1718 (83) 3431-2571</p>
+                    <p>Horário de Funcionamento: Segunda à Domingo | Telefone: (83 ) 99690-1718 (83) 3431-2571</p>
                     <p>Farmacêutico Responsável: Dr. Edgar Xavier | CRF/PB: 2710</p>
                 </div>
 
@@ -147,7 +149,9 @@
             </div>
         </footer>
     </div>
+    <!-- FIM DA VIEW HOME -->
 
+    <!-- VIEW DE DETALHES -->
     <div id="view-details" class="page-view hidden-view container mx-auto px-4 py-6">
         <button onclick="navigate('home')" class="mb-4 text-farm-blue font-bold flex items-center gap-2">
             <i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar para a lista
@@ -196,7 +200,7 @@
         </span>
     </a>
 
-    <!-- AVISO FLUTUANTE DE PRODUTO ADICIONADO (Melhoria de UX) -->
+    <!-- AVISO FLUTUANTE DE PRODUTO ADICIONADO -->
     <div id="toast-aviso" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-[300] transition-all duration-300 transform translate-y-[-20px] opacity-0 pointer-events-none">
         <i class="fas fa-check-circle text-green-400 text-lg" aria-hidden="true"></i>
         <span class="text-sm font-bold tracking-wide">Produto adicionado ao carrinho!</span>
@@ -205,7 +209,7 @@
     <!-- POPUP DE AVISO INICIAL -->
     <div id="popup-inicial" class="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center p-4 hidden">
         <div class="relative bg-white rounded-2xl overflow-hidden max-w-[320px] w-full shadow-2xl animate-fade-in">
-            <button onclick="fecharPopup()" class="absolute top-2 right-2 bg-black/60 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg z-10 active:scale-90 transition-transform" aria-label="Fechar Aviso">
+            <button onclick="fecharPopup( )" class="absolute top-2 right-2 bg-black/60 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg z-10 active:scale-90 transition-transform" aria-label="Fechar Aviso">
                 &times;
             </button>
             <img src="popup-aviso.jpg" alt="Aviso Importante sobre Entregas em todo o Brasil" class="w-full h-auto block">
@@ -281,7 +285,7 @@
         function shareProduct(code, name) {
             const url = `${window.location.origin}${window.location.pathname}#detalhes/${code}`;
             const text = `Confira este produto na Farmácia dos Pobres: ${name}\nVeja aqui: ${url}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+            window.open(`https://wa.me/?text=${encodeURIComponent(text )}`, '_blank');
         }
 
         function loadInventory() {
@@ -396,7 +400,6 @@
             cartBtn.classList.add('scale-110');
             setTimeout(() => cartBtn.classList.remove('scale-110'), 200);
 
-            // Toast feedback visual
             const toast = document.getElementById('toast-aviso');
             toast.querySelector('span').innerText = `Adicionado: ${product.name.substring(0, 25)}...`;
             toast.classList.remove('opacity-0', 'translate-y-[-20px]', 'pointer-events-none');
@@ -459,7 +462,7 @@
             msg += `*Subtotal:* R$ ${subtotal.toLocaleString('pt-br', {minimumFractionDigits: 2})}\n`;
             msg += `*Entrega:* ${deliveryFee === 0 ? "GRÁTIS" : "R$ 2,00"}\n`;
             msg += `*TOTAL FINAL: R$ ${total.toLocaleString('pt-br', {minimumFractionDigits: 2})}*`;
-            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg )}`, '_blank');
         }
 
         new Swiper(".mySwiper", {
@@ -474,7 +477,6 @@
         window.onload = function() {
             loadInventory();
             
-            // NOVO: Verifica se existe uma busca na URL do site
             const urlParams = new URLSearchParams(window.location.search);
             const buscaParam = urlParams.get('busca');
             if (buscaParam) {
@@ -482,87 +484,73 @@
                     const inputBusca = document.getElementById('search-input');
                     if (inputBusca) {
                         inputBusca.value = buscaParam;
-                        filterProducts(); // Executa a busca automaticamente
+                        filterProducts();
                     }
-                }, 500); // Aguarda o estoque carregar antes de filtrar
+                }, 500);
             }
 
             setTimeout(() => {
                 document.getElementById('popup-inicial').classList.remove('hidden');
             }, 1000); 
         };
-        // ==========================================
-// CONFIGURAÇÃO DE FUNCIONAMENTO E ENTREGAS
-// ==========================================
 
-// TRAVAS PARA DIAS EXCEPCIONAIS (Altere aqui quando precisar!)
-const FECHADO_EXCEPCIONAL = false;    // Mude para 'true' se a farmácia estiver 100% FECHADA hoje (Feriados inteiros)
-const ENTREGAS_ATIVAS_HOJE = true;    // Mude para 'false' se a loja estiver aberta mas sem entregador
-const HOJE_HORARIO_ESPECIAL = false;  // Mude para 'true' para meio expediente (Ex: Feriado até 12h)
-const HORA_FECHAMENTO_ESPECIAL = 720; // 720 min = 12:00 (Meio-dia)
+        const FECHADO_EXCEPCIONAL = false;
+        const ENTREGAS_ATIVAS_HOJE = true;
+        const HOJE_HORARIO_ESPECIAL = false;
+        const HORA_FECHAMENTO_ESPECIAL = 720;
 
-function atualizarStatusFuncionamento() {
-    const agora = new Date();
-    const diaSemana = agora.getDay(); // 0 = Domingo, 1 = Segunda, ..., 6 = Sábado
-    const hora = agora.getHours();
-    const minuto = agora.getMinutes();
-    const tempoEmMinutos = (hora * 60) + minuto;
+        function atualizarStatusFuncionamento() {
+            const agora = new Date();
+            const diaSemana = agora.getDay();
+            const hora = agora.getHours();
+            const minuto = agora.getMinutes();
+            const tempoEmMinutos = (hora * 60) + minuto;
 
-    const banner = document.getElementById('status-loja-banner');
-    if (!banner) return;
+            const banner = document.getElementById('status-loja-banner');
+            if (!banner) return;
 
-    // DEFINIÇÃO DOS HORÁRIOS PADRÃO (em minutos a partir da meia-noite)
-    let horaAbertura = 420; // 07:00 da manhã para todos os dias
-    let horaFechamento = 1080; // Padrão Segunda a Sexta: 18:00 (1080 min)
+            let horaAbertura = 420;
+            let horaFechamento = 1080;
 
-    if (diaSemana === 6) { 
-        // Sábado: Fecha às 17:00 (1020 min)
-        horaFechamento = 1020; 
-    } else if (diaSemana === 0) { 
-        // Domingo: Fecha às 11:00 (660 min)
-        horaFechamento = 660; 
-    }
+            if (diaSemana === 6) { 
+                horaFechamento = 1020; 
+            } else if (diaSemana === 0) { 
+                horaFechamento = 660; 
+            }
 
-    // Se a trava de horário especial estiver ativada, ela sobressai ao padrão do dia
-    if (HOJE_HORARIO_ESPECIAL) {
-        horaFechamento = HORA_FECHAMENTO_ESPECIAL;
-    }
+            if (HOJE_HORARIO_ESPECIAL) {
+                horaFechamento = HORA_FECHAMENTO_ESPECIAL;
+            }
 
-    const estaAbertoHora = tempoEmMinutos >= horaAbertura && tempoEmMinutos < horaFechamento;
+            const estaAbertoHora = tempoEmMinutos >= horaAbertura && tempoEmMinutos < horaFechamento;
 
-    // REGRA 1: Fechamento Excepcional (Loja 100% Fechada em Feriado/Evento)
-    if (FECHADO_EXCEPCIONAL) {
-        banner.className = "bg-red-100 text-red-800 border-red-200 text-center py-2.5 px-4 text-xs font-bold border-b";
-        banner.innerHTML = `🚫 <span>Hoje estamos fechados por conta do feriado/evento. Voltamos no próximo dia útil às 07:00!</span>`;
-        return;
-    }
+            if (FECHADO_EXCEPCIONAL) {
+                banner.className = "bg-red-100 text-red-800 border-red-200 text-center py-2.5 px-4 text-xs font-bold border-b";
+                banner.innerHTML = `🚫 <span>Hoje estamos fechados por conta do feriado/evento. Voltamos no próximo dia útil às 07:00!</span>`;
+                return;
+            }
 
-    // REGRA 2: Entregas Pausadas Manualmente (Sem Motoqueiro / Chuva)
-    if (!ENTREGAS_ATIVAS_HOJE && estaAbertoHora) {
-        banner.className = "bg-orange-100 text-orange-900 border-orange-200 text-center py-2.5 px-4 text-xs font-bold border-b";
-        banner.innerHTML = `⚠️ <span>Loja aberta, mas <strong>entregas suspensas</strong> no momento. Retirada no balcão funcionando normalmente!</span>`;
-        return;
-    }
+            if (!ENTREGAS_ATIVAS_HOJE && estaAbertoHora) {
+                banner.className = "bg-orange-100 text-orange-900 border-orange-200 text-center py-2.5 px-4 text-xs font-bold border-b";
+                banner.innerHTML = `⚠️ <span>Loja aberta, mas <strong>entregas suspensas</strong> no momento. Retirada no balcão funcionando normalmente!</span>`;
+                return;
+            }
 
-    // REGRA 3: Atendimento com Horário Especial (Ex: Feriado até 12:00)
-    if (HOJE_HORARIO_ESPECIAL && estaAbertoHora) {
-        banner.className = "bg-yellow-100 text-yellow-900 border-yellow-300 text-center py-2.5 px-4 text-xs font-bold border-b";
-        banner.innerHTML = `⚠️ <span class="uppercase tracking-wide">Atendimento Especial</span> • Abertos hoje até às 12:00 Frete Grátis a partir de R$ 20,00! !`;
-    }
-    // REGRA 4: Funcionamento Normal em Aberto
-    else if (estaAbertoHora) {
-        banner.className = "bg-green-100 text-green-900 border-green-200 text-center py-2.5 px-4 text-xs font-bold border-b";
-        banner.innerHTML = `🟢 <span class="uppercase tracking-wide">Aberto Agora</span> • Fazendo entregas em Pombal | Frete Grátis a partir de R$ 20,00!`;
-    } 
-    // REGRA 5: Fora do Horário (Loja Fechada)
-    else {
-        banner.className = "bg-gray-200 text-gray-700 border-gray-300 text-center py-2.5 px-4 text-xs font-bold border-b";
-        banner.innerHTML = `🌙 <span>Loja Fechada no momento • Pedidos feitos agora serão entregues a partir das 07:00!</span>`;
-    }
-}
+            if (HOJE_HORARIO_ESPECIAL && estaAbertoHora) {
+                banner.className = "bg-yellow-100 text-yellow-900 border-yellow-300 text-center py-2.5 px-4 text-xs font-bold border-b";
+                banner.innerHTML = `⚠️ <span class="uppercase tracking-wide">Atendimento Especial</span> • Abertos hoje até às 12:00 | Frete Grátis a partir de R$ 20,00!`;
+            }
+            else if (estaAbertoHora) {
+                banner.className = "bg-green-100 text-green-900 border-green-200 text-center py-2.5 px-4 text-xs font-bold border-b";
+                banner.innerHTML = `🟢 <span class="uppercase tracking-wide">Aberto Agora</span> • Fazendo entregas em Pombal | Frete Grátis a partir de R$ 20,00!`;
+            } 
+            else {
+                banner.className = "bg-gray-200 text-gray-700 border-gray-300 text-center py-2.5 px-4 text-xs font-bold border-b";
+                banner.innerHTML = `🌙 <span>Loja Fechada no momento • Pedidos feitos agora serão entregues a partir das 07:00!</span>`;
+            }
+        }
 
-// Executa o cálculo do horário ao carregar o site
-window.addEventListener('DOMContentLoaded', atualizarStatusFuncionamento);
+        window.addEventListener('DOMContentLoaded', atualizarStatusFuncionamento);
     </script>
 </body>
 </html>
