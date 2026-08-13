@@ -228,6 +228,7 @@
         let cart = [];
 
         const CODIGOS_DESTAQUES = ['35814', '36945', '10496', '36950', '16377', '27607'];
+        const CODIGOS_PBM = ['3927', '4783', '3132'];
 
         function navigate(page, prodCode = null) {
             const homeView = document.getElementById('view-home');
@@ -353,27 +354,40 @@
             `).join('');
         }
 
-        function renderProducts(list) {
-            const grid = document.getElementById('product-grid');
-            const noRes = document.getElementById('no-results');
-            grid.innerHTML = '';
-            if(list.length === 0) { noRes.classList.remove('hidden'); return; }
-            noRes.classList.add('hidden');
+       // COLE ESTA NOVA VERSÃO:
+function renderProducts(list) {
+    const grid = document.getElementById('product-grid');
+    const noRes = document.getElementById('no-results');
+    grid.innerHTML = '';
+    if(list.length === 0) { noRes.classList.remove('hidden'); return; }
+    noRes.classList.add('hidden');
+    
+    grid.innerHTML = list.slice(0, 100).map((p) => {
+        const isPbm = CODIGOS_PBM.includes(p.code);
+
+        return `
+        <div class="bg-white p-3 rounded-lg shadow-sm border ${isPbm ? 'border-green-400 bg-green-50/20' : 'border-gray-200'} flex flex-col justify-between hover:border-farm-blue transition-all relative">
             
-            grid.innerHTML = list.slice(0, 100).map((p) => `
-                <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-200 flex flex-col justify-between hover:border-farm-blue transition-all">
-                    <div onclick="navigate('details', '${p.code}')" class="cursor-pointer">
-                        <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" alt="${p.name}" class="w-full h-24 object-contain mb-2 opacity-80">
-                        <p class="text-[9px] text-gray-400 font-bold">REF: ${p.code}</p>
-                        <h3 class="text-[11px] font-bold text-gray-700 leading-tight mb-2 h-8 overflow-hidden">${p.name}</h3>
-                        <p class="text-farm-blue font-black text-sm mb-2">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
-                    </div>
-                    <button onclick="addToCart('${p.code}')" class="w-full bg-farm-red text-white text-[10px] py-2 rounded font-bold uppercase active:scale-95 transition-all">
-                        Comprar
-                    </button>
-                </div>
-            `).join('');
-        }
+            ${isPbm ? `
+                <span class="absolute top-1 left-1 bg-green-600 text-white font-black text-[7px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm z-10">
+                    <i class="fab fa-whatsapp"></i> Condição Especial / WhatsApp
+                </span>
+            ` : ''}
+
+            <div onclick="navigate('details', '${p.code}')" class="cursor-pointer pt-2">
+                <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" alt="${p.name}" class="w-full h-24 object-contain mb-2 opacity-80">
+                <p class="text-[9px] text-gray-400 font-bold">REF: ${p.code}</p>
+                <h3 class="text-[11px] font-bold text-gray-700 leading-tight mb-2 h-8 overflow-hidden">${p.name}</h3>
+                <p class="text-farm-blue font-black text-sm mb-2">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
+            </div>
+
+            <button onclick="addToCart('${p.code}')" class="w-full ${isPbm ? 'bg-green-600 hover:bg-green-700' : 'bg-farm-red'} text-white text-[10px] py-2 rounded font-bold uppercase active:scale-95 transition-all flex items-center justify-center gap-1">
+                ${isPbm ? '<i class="fab fa-whatsapp text-xs"></i> Consultar PBM' : 'Comprar'}
+            </button>
+        </div>
+        `;
+    }).join('');
+}
 
         function filterProducts() {
             const term = document.getElementById('search-input').value.toLowerCase();
