@@ -391,19 +391,39 @@ function renderProducts(list) {
     }).join('');
 }
 
-        function filterProducts() {
-            const term = document.getElementById('search-input').value.toLowerCase();
-            const containerHighlights = document.getElementById('destaques-container');
-            
-            if(term.length > 0) {
-                containerHighlights.classList.add('hidden');
-            } else {
-                renderHighlights();
-            }
+   function filterProducts() {
+    const rawTerm = document.getElementById('search-input').value.toLowerCase().trim();
+    const containerHighlights = document.getElementById('destaques-container');
+    
+    if (rawTerm.length > 0) {
+        containerHighlights.classList.add('hidden');
+    } else {
+        renderHighlights();
+        renderProducts(allProducts);
+        return;
+    }
 
-            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term) || p.code.includes(term));
-            renderProducts(filtered);
-        }
+    // Quebra o termo digitado em palavras separadas (ex: ["leite", "ninho"])
+    const terms = rawTerm.split(' ').filter(t => t.length > 0);
+
+    // 1ª Tentativa: Busca produtos que contenham TODAS as palavras digitadas
+    let filtered = allProducts.filter(p => {
+        const nameLower = p.name.toLowerCase();
+        const codeLower = p.code.toLowerCase();
+        return terms.every(term => nameLower.includes(term) || codeLower.includes(term));
+    });
+
+    // 2ª Tentativa: Se não achou nada com todas as palavras, busca por QUALQUER uma das palavras
+    if (filtered.length === 0) {
+        filtered = allProducts.filter(p => {
+            const nameLower = p.name.toLowerCase();
+            const codeLower = p.code.toLowerCase();
+            return terms.some(term => nameLower.includes(term) || codeLower.includes(term));
+        });
+    }
+
+    renderProducts(filtered);
+}
 
         function addToCart(code) {
             const product = allProducts.find(p => p.code == code);
