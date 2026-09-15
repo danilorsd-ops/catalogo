@@ -391,11 +391,22 @@ function renderProducts(list) {
     }).join('');
 }
 
-   function filterProducts() {
-    const rawTerm = document.getElementById('search-input').value.toLowerCase().trim();
+  // Função auxiliar para remover acentos e converter ç em c
+function normalizarTexto(texto) {
+    return texto
+        .toLowerCase()
+        .replace(/ç/g, 'c') // Transforma ç em c
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Remove acentos (ã -> a, é -> e)
+}
+
+function filterProducts() {
+    const rawInput = document.getElementById('search-input').value;
     const containerHighlights = document.getElementById('destaques-container');
     
-    if (rawTerm.length > 0) {
+    // Normaliza a busca do usuário (remove acentos e ç)
+    const normalizedInput = normalizarTexto(rawInput).trim();
+
+    if (normalizedInput.length > 0) {
         containerHighlights.classList.add('hidden');
     } else {
         renderHighlights();
@@ -403,22 +414,22 @@ function renderProducts(list) {
         return;
     }
 
-    // Quebra o termo digitado em palavras separadas (ex: ["leite", "ninho"])
-    const terms = rawTerm.split(' ').filter(t => t.length > 0);
+    // Quebra o termo digitado em palavras separadas
+    const terms = normalizedInput.split(' ').filter(t => t.length > 0);
 
     // 1ª Tentativa: Busca produtos que contenham TODAS as palavras digitadas
     let filtered = allProducts.filter(p => {
-        const nameLower = p.name.toLowerCase();
-        const codeLower = p.code.toLowerCase();
-        return terms.every(term => nameLower.includes(term) || codeLower.includes(term));
+        const nameNormalized = normalizarTexto(p.name);
+        const codeNormalized = normalizarTexto(p.code);
+        return terms.every(term => nameNormalized.includes(term) || codeNormalized.includes(term));
     });
 
-    // 2ª Tentativa: Se não achou nada com todas as palavras, busca por QUALQUER uma das palavras
+    // 2ª Tentativa: Se não achou com todas, busca por QUALQUER uma das palavras
     if (filtered.length === 0) {
         filtered = allProducts.filter(p => {
-            const nameLower = p.name.toLowerCase();
-            const codeLower = p.code.toLowerCase();
-            return terms.some(term => nameLower.includes(term) || codeLower.includes(term));
+            const nameNormalized = normalizarTexto(p.name);
+            const codeNormalized = normalizarTexto(p.code);
+            return terms.some(term => nameNormalized.includes(term) || codeNormalized.includes(term));
         });
     }
 
