@@ -391,34 +391,45 @@ function renderProducts(list) {
     }).join('');
 }
 
-   function filterProducts() {
-    const rawTerm = document.getElementById('search-input').value.toLowerCase().trim();
+   // Função leve apenas para tirar acentos e transformar ç em c na BUSCA
+function normalizarTexto(texto) {
+    if (!texto) return '';
+    return texto
+        .toString()
+        .toLowerCase()
+        .replace(/ç/g, 'c')
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function filterProducts() {
+    const rawInput = document.getElementById('search-input').value;
     const containerHighlights = document.getElementById('destaques-container');
     
-    if (rawTerm.length > 0) {
-        containerHighlights.classList.add('hidden');
+    const normalizedInput = normalizarTexto(rawInput).trim();
+
+    if (normalizedInput.length > 0) {
+        if (containerHighlights) containerHighlights.classList.add('hidden');
     } else {
-        renderHighlights();
+        if (typeof renderHighlights === 'function') renderHighlights();
         renderProducts(allProducts);
         return;
     }
 
-    // Quebra o termo digitado em palavras separadas (ex: ["leite", "ninho"])
-    const terms = rawTerm.split(' ').filter(t => t.length > 0);
+    const terms = normalizedInput.split(' ').filter(t => t.length > 0);
 
-    // 1ª Tentativa: Busca produtos que contenham TODAS as palavras digitadas
+    // 1ª Tentativa: Produtos que contêm TODAS as palavras
     let filtered = allProducts.filter(p => {
-        const nameLower = p.name.toLowerCase();
-        const codeLower = p.code.toLowerCase();
-        return terms.every(term => nameLower.includes(term) || codeLower.includes(term));
+        const nameNorm = normalizarTexto(p.name);
+        const codeNorm = normalizarTexto(p.code);
+        return terms.every(term => nameNorm.includes(term) || codeNorm.includes(term));
     });
 
-    // 2ª Tentativa: Se não achou nada com todas as palavras, busca por QUALQUER uma das palavras
+    // 2ª Tentativa: Se não achar, busca por QUALQUER uma das palavras
     if (filtered.length === 0) {
         filtered = allProducts.filter(p => {
-            const nameLower = p.name.toLowerCase();
-            const codeLower = p.code.toLowerCase();
-            return terms.some(term => nameLower.includes(term) || codeLower.includes(term));
+            const nameNorm = normalizarTexto(p.name);
+            const codeNorm = normalizarTexto(p.code);
+            return terms.some(term => nameNorm.includes(term) || codeNorm.includes(term));
         });
     }
 
