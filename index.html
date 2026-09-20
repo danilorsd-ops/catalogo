@@ -649,7 +649,7 @@ function sendOrder() {
             }, 1000); 
         };
 
-        const FECHADO_EXCEPCIONAL = false;
+        const FECHADO_EXCEPCIONAL = true;
         const ENTREGAS_ATIVAS_HOJE = true;
         const HOJE_HORARIO_ESPECIAL = false;
         const HORA_FECHAMENTO_ESPECIAL = 720;
@@ -681,7 +681,7 @@ function sendOrder() {
 
             if (FECHADO_EXCEPCIONAL) {
                 banner.className = "bg-red-100 text-red-800 border-red-200 text-center py-2.5 px-4 text-xs font-bold border-b";
-                banner.innerHTML = `🚫 <span>Hoje estamos fechados por conta do feriado/evento. Voltamos no próximo dia útil às 07:00!</span>`;
+                banner.innerHTML = `🚫 <span>Hoje estamos fechados por conta do BALANÇO. Voltamos no próximo dia útil às 07:00!</span>`;
                 return;
             }
 
