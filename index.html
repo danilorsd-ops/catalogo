@@ -111,6 +111,8 @@
             </div>
             <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
             <div id="no-results" class="hidden text-center py-20 text-gray-500">Nenhum produto encontrado na busca.</div>
+            <p id="product-count" class="hidden text-center text-xs text-gray-500 mt-4"></p>
+            <button id="load-more-products" type="button" onclick="loadMoreProducts()" class="hidden mx-auto mt-3 bg-farm-blue text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90">Carregar mais produtos</button>
         </main>
 
         <footer class="bg-white border-t border-gray-200 py-8 mt-12">
@@ -257,7 +259,21 @@
                             '14747', '9570', '8918', '9995', '10148', '16154', '16317', '26727', '21044', '10656', '4988', '6659', '5071', '3234', '5351', '11499', '6396', '10617', '14378', 
                             '14377', '25735', '27810', '14594', '15197', '3518', '8000',];
 
-        function navigate(page, prodCode = null) {
+        function escapeHtml(value) {
+            return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+        }
+
+        function formatCurrency(value) {
+            const amount = Number.isFinite(Number(value)) ? Number(value) : 0;
+            return amount.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function roundToCents(value) {
+            return Math.round((value + Number.EPSILON) * 100) / 100;
+        }
+
+        function navigate(page, prodCode = null, updateHistory = true) {
             const homeView = document.getElementById('view-home');
             const detailsView = document.getElementById('view-details');
             const searchBar = document.getElementById('search-container');
@@ -266,43 +282,46 @@
                 homeView.classList.remove('hidden-view');
                 detailsView.classList.add('hidden-view');
                 searchBar.classList.remove('hidden');
-                window.history.pushState({}, '', '/');
+                if (updateHistory) window.history.pushState({}, '', '/');
             } else if (page === 'details' && prodCode) {
                 homeView.classList.add('hidden-view');
                 detailsView.classList.remove('hidden-view');
                 searchBar.classList.add('hidden');
                 showProductDetails(prodCode);
-                window.history.pushState({code: prodCode}, '', `#detalhes/${prodCode}`);
+                if (updateHistory) window.history.pushState({code: prodCode}, '', `#detalhes/${prodCode}`);
             }
             window.scrollTo(0,0);
         }
 
         window.onpopstate = function(event) {
-            if (event.state && event.state.code) { navigate('details', event.state.code); } 
-            else { navigate('home'); }
+            if (event.state && event.state.code) { navigate('details', event.state.code, false); }
+            else { navigate('home', null, false); }
         };
 
         function showProductDetails(code) {
             const p = allProducts.find(item => item.code == code);
             const content = document.getElementById('product-detail-content');
-            if(!p) { content.innerHTML = "Produto não encontrado."; return; }
+            if (!p) { content.textContent = "Produto não encontrado."; return; }
 
+            const safeCode = escapeHtml(p.code);
+            const safeName = escapeHtml(p.name);
+            const imageCode = encodeURIComponent(p.code);
             content.innerHTML = `
                 <div class="w-full md:w-1/2">
-                    <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" alt="${p.name}" class="w-full h-auto rounded-xl shadow-inner border">
+                    <img src="fotos/${imageCode}.jpg" onerror="this.src='produto.jpg'" alt="${safeName}" class="w-full h-auto rounded-xl shadow-inner border">
                 </div>
                 <div class="w-full md:w-1/2 space-y-4">
-                    <p class="text-sm text-gray-400 font-bold">CÓDIGO REF: ${p.code}</p>
-                    <h2 class="text-2xl font-black text-gray-800">${p.name}</h2>
-                    <p class="text-3xl text-farm-blue font-black">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
+                    <p class="text-sm text-gray-400 font-bold">CÓDIGO REF: ${safeCode}</p>
+                    <h2 class="text-2xl font-black text-gray-800">${safeName}</h2>
+                    <p class="text-3xl text-farm-blue font-black">R$ ${formatCurrency(p.price)}</p>
                     <div class="bg-blue-50 p-4 rounded-lg text-sm text-blue-800">
-                        <i class="fas fa-truck"></i> Disponível para entrega imediata em toda Pombal. 
+                        <i class="fas fa-truck"></i> Disponível para entrega imediata em toda Pombal.
                     </div>
                     <div class="flex flex-col gap-3 pt-4">
-                        <button onclick="addToCart('${p.code}')" class="w-full bg-farm-red text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-all">
+                        <button type="button" data-product-action="add" data-product-code="${safeCode}" class="w-full bg-farm-red text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-all">
                             ADICIONAR AO CARRINHO
                         </button>
-                        <button onclick="shareProduct('${p.code}', '${p.name}')" class="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                        <button type="button" data-product-action="share" data-product-code="${safeCode}" class="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
                             <i class="fas fa-share-alt"></i> COMPARTILHAR PRODUTO
                         </button>
                     </div>
@@ -311,10 +330,35 @@
         }
 
         function shareProduct(code, name) {
-            const url = `${window.location.origin}${window.location.pathname}#detalhes/${code}`;
+            const url = `${window.location.origin}${window.location.pathname}#detalhes/${encodeURIComponent(code)}`;
             const text = `Confira este produto na Farmácia dos Pobres: ${name}\nVeja aqui: ${url}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text )}`, '_blank');
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         }
+
+        document.addEventListener('click', function(event) {
+            const actionElement = event.target instanceof Element ? event.target.closest('[data-product-action]') : null;
+            if (!actionElement) return;
+
+            const code = actionElement.dataset.productCode;
+            const product = allProducts.find(item => item.code === code);
+            if (!product) return;
+
+            if (actionElement.dataset.productAction === 'details') navigate('details', code);
+            if (actionElement.dataset.productAction === 'add') addToCart(code);
+            if (actionElement.dataset.productAction === 'share') shareProduct(product.code, product.name);
+        });
+
+        function showInventoryError() {
+            const loading = document.getElementById('loading');
+            loading.innerHTML = 'Não foi possível carregar o estoque. Atualize a página e tente novamente.';
+            loading.classList.remove('hidden');
+            document.getElementById('product-grid').innerHTML = '';
+            document.getElementById('product-count').classList.add('hidden');
+            document.getElementById('load-more-products').classList.add('hidden');
+            document.getElementById('no-results').classList.add('hidden');
+        }
+
+
 
         function loadInventory() {
             Papa.parse(CSV_URL, {
@@ -334,87 +378,129 @@
                         return {
                             code: (getVal('Codigo') || "").trim(),
                             name: (getVal('produto') || "Sem nome").trim(),
-                            price: parseFloat(rawPrice.toString().replace(',', '.')),
-                            stock: parseInt(rawStock)
+                            price: parseFloat(rawPrice.toString().replace(",", ".")),
+                            stock: parseInt(rawStock, 10)
                         };
-                    }).filter(p => p.stock > 0 && p.name !== "Sem nome");
+                    }).filter(p => p.stock > 0 && Number.isFinite(p.price) && p.price >= 0 && p.code !== "" && p.name !== "Sem nome");
 
                     document.getElementById('loading').classList.add('hidden');
                     renderHighlights();
                     renderProducts(allProducts);
-                    
+
                     const hash = window.location.hash;
-                    if(hash.includes('#detalhes/')) {
+                    if (hash.includes('#detalhes/')) {
                         const code = hash.split('/')[1];
-                        navigate('details', code);
+                        navigate('details', code, false);
                     }
+                },
+                error: function() {
+                    showInventoryError();
                 }
             });
         }
+
+
 
         function renderHighlights() {
             const grid = document.getElementById('destaques-grid');
             const container = document.getElementById('destaques-container');
             const filteredHighlights = allProducts.filter(p => CODIGOS_DESTAQUES.includes(p.code));
-            
+
             if (filteredHighlights.length === 0) {
                 container.classList.add('hidden');
                 return;
             }
-            
+
             container.classList.remove('hidden');
-            grid.innerHTML = filteredHighlights.map((p) => `
-                <div class="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col justify-between hover:border-yellow-400 transition-all relative">
-                    <span class="absolute top-1 left-1 bg-yellow-400 text-white font-black text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">
-                        <i class="fas fa-star"></i> Top
-                    </span>
-                    <div onclick="navigate('details', '${p.code}')" class="cursor-pointer pt-3">
-                        <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" alt="${p.name}" class="w-full h-20 object-contain mb-1 opacity-95">
-                        <p class="text-[8px] text-gray-400 font-bold">REF: ${p.code}</p>
-                        <h3 class="text-[10px] font-extrabold text-gray-700 leading-tight mb-1 h-8 overflow-hidden">${p.name}</h3>
-                        <p class="text-farm-blue font-black text-xs mb-1">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
+            grid.innerHTML = filteredHighlights.map(p => {
+                const safeCode = escapeHtml(p.code);
+                const safeName = escapeHtml(p.name);
+                const imageCode = encodeURIComponent(p.code);
+                return `
+                    <div class="bg-gray-50 p-2 rounded-lg border border-gray-100 flex flex-col justify-between hover:border-yellow-400 transition-all relative">
+                        <span class="absolute top-1 left-1 bg-yellow-400 text-white font-black text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">
+                            <i class="fas fa-star"></i> Top
+                        </span>
+                        <div data-product-action="details" data-product-code="${safeCode}" class="cursor-pointer pt-3">
+                            <img src="fotos/${imageCode}.jpg" onerror="this.src='produto.jpg'" alt="${safeName}" class="w-full h-20 object-contain mb-1 opacity-95">
+                            <p class="text-[8px] text-gray-400 font-bold">REF: ${safeCode}</p>
+                            <h3 class="text-[10px] font-extrabold text-gray-700 leading-tight mb-1 h-8 overflow-hidden">${safeName}</h3>
+                            <p class="text-farm-blue font-black text-xs mb-1">R$ ${formatCurrency(p.price)}</p>
+                        </div>
+                        <button type="button" data-product-action="add" data-product-code="${safeCode}" class="w-full bg-farm-red text-white text-[9px] py-1.5 rounded font-bold uppercase active:scale-95 transition-all">
+                            Comprar
+                        </button>
                     </div>
-                    <button onclick="addToCart('${p.code}')" class="w-full bg-farm-red text-white text-[9px] py-1.5 rounded font-bold uppercase active:scale-95 transition-all">
-                        Comprar
-                    </button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
+
+
        // COLE ESTA NOVA VERSÃO:
-function renderProducts(list) {
+let currentProductResults = [];
+let visibleProductCount = 100;
+
+function renderProducts(list, reset = true) {
     const grid = document.getElementById('product-grid');
     const noRes = document.getElementById('no-results');
+    const count = document.getElementById('product-count');
+    const loadMoreButton = document.getElementById('load-more-products');
+
+    if (reset) {
+        currentProductResults = list;
+        visibleProductCount = 100;
+    }
+
     grid.innerHTML = '';
-    if(list.length === 0) { noRes.classList.remove('hidden'); return; }
+    if (currentProductResults.length === 0) {
+        noRes.classList.remove('hidden');
+        count.classList.add('hidden');
+        loadMoreButton.classList.add('hidden');
+        return;
+    }
     noRes.classList.add('hidden');
-    
-    grid.innerHTML = list.slice(0, 100).map((p) => {
+
+    grid.innerHTML = currentProductResults.slice(0, visibleProductCount).map(p => {
+        const safeCode = escapeHtml(p.code);
+        const safeName = escapeHtml(p.name);
+        const imageCode = encodeURIComponent(p.code);
         const isPbm = CODIGOS_PBM.includes(p.code);
 
         return `
-        <div class="bg-white p-3 rounded-lg shadow-sm border ${isPbm ? 'border-green-400 bg-green-50/20' : 'border-gray-200'} flex flex-col justify-between hover:border-farm-blue transition-all relative">
-            
-            ${isPbm ? `
-                <span class="absolute top-1 left-1 bg-green-600 text-white font-black text-[7px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm z-10">
-                    <i class="fab fa-whatsapp"></i> Condição Especial / WhatsApp
-                </span>
-            ` : ''}
+            <div class="bg-white p-3 rounded-lg shadow-sm border ${isPbm ? 'border-green-400 bg-green-50/20' : 'border-gray-200'} flex flex-col justify-between hover:border-farm-blue transition-all relative">
+                ${isPbm ? `
+                    <span class="absolute top-1 left-1 bg-green-600 text-white font-black text-[7px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm z-10">
+                        <i class="fab fa-whatsapp"></i> Condição Especial / WhatsApp
+                    </span>
+                ` : ''}
 
-            <div onclick="navigate('details', '${p.code}')" class="cursor-pointer pt-2">
-                <img src="fotos/${p.code}.jpg" onerror="this.src='produto.jpg'" alt="${p.name}" class="w-full h-24 object-contain mb-2 opacity-80">
-                <p class="text-[9px] text-gray-400 font-bold">REF: ${p.code}</p>
-                <h3 class="text-[11px] font-bold text-gray-700 leading-tight mb-2 h-8 overflow-hidden">${p.name}</h3>
-                <p class="text-farm-blue font-black text-sm mb-2">R$ ${p.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
+                <div data-product-action="details" data-product-code="${safeCode}" class="cursor-pointer pt-2">
+                    <img src="fotos/${imageCode}.jpg" onerror="this.src='produto.jpg'" alt="${safeName}" class="w-full h-24 object-contain mb-2 opacity-80">
+                    <p class="text-[9px] text-gray-400 font-bold">REF: ${safeCode}</p>
+                    <h3 class="text-[11px] font-bold text-gray-700 leading-tight mb-2 h-8 overflow-hidden">${safeName}</h3>
+                    <p class="text-farm-blue font-black text-sm mb-2">R$ ${formatCurrency(p.price)}</p>
+                </div>
+
+                <button type="button" data-product-action="add" data-product-code="${safeCode}" class="w-full ${isPbm ? 'bg-green-600 hover:bg-green-700' : 'bg-farm-red'} text-white text-[10px] py-2 rounded font-bold uppercase active:scale-95 transition-all flex items-center justify-center gap-1">
+                    ${isPbm ? '<i class="fab fa-whatsapp text-xs"></i> Consultar PBM' : 'Comprar'}
+                </button>
             </div>
-
-            <button onclick="addToCart('${p.code}')" class="w-full ${isPbm ? 'bg-green-600 hover:bg-green-700' : 'bg-farm-red'} text-white text-[10px] py-2 rounded font-bold uppercase active:scale-95 transition-all flex items-center justify-center gap-1">
-                ${isPbm ? '<i class="fab fa-whatsapp text-xs"></i> Consultar PBM' : 'Comprar'}
-            </button>
-        </div>
         `;
     }).join('');
+
+    const shown = Math.min(visibleProductCount, currentProductResults.length);
+    count.textContent = `Mostrando ${shown} de ${currentProductResults.length} produtos`;
+    count.classList.remove('hidden');
+    loadMoreButton.classList.toggle('hidden', shown >= currentProductResults.length);
 }
+
+function loadMoreProducts() {
+    visibleProductCount += 100;
+    renderProducts(currentProductResults, false);
+}
+
+
 
    // Função leve apenas para tirar acentos e transformar ç em c na BUSCA
 function normalizarTexto(texto) {
@@ -492,8 +578,8 @@ function filterProducts() {
                 container.innerHTML = cart.map((item, i) => `
                     <div class="flex justify-between items-center bg-gray-50 p-2 rounded text-xs border">
                         <div class="flex-1">
-                            <p class="font-bold text-gray-800">${item.name}</p>
-                            <p class="text-gray-500">${item.qty}x R$ ${item.price.toLocaleString('pt-br', {minimumFractionDigits: 2})}</p>
+                            <p class="font-bold text-gray-800">${escapeHtml(item.name)}</p>
+                            <p class="text-gray-500">${item.qty}x R$ ${formatCurrency(item.price)}</p>
                         </div>
                         <button onclick="removeItem(${i})" class="text-red-500 p-2 hover:text-red-700"><i class="fas fa-trash"></i></button>
                     </div>
@@ -544,26 +630,24 @@ function applyCoupon() {
 }
 
 function calculateTotals() {
-    const subtotal = cart.reduce((acc, item) => acc + (item.qty * item.price), 0);
+    const subtotal = roundToCents(cart.reduce((acc, item) => acc + (item.qty * item.price), 0));
     const deliveryFee = (subtotal > 0 && subtotal < 20) ? 2.00 : 0.00;
-    
-    const discountAmount = subtotal * currentDiscount;
-    const total = subtotal - discountAmount + deliveryFee;
+    const discountAmount = roundToCents(subtotal * currentDiscount);
+    const total = roundToCents(subtotal - discountAmount + deliveryFee);
 
-    document.getElementById('subtotal').innerText = `R$ ${subtotal.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-    
+    document.getElementById('subtotal').innerText = `R$ ${formatCurrency(subtotal)}`;
+
     const discountRow = document.getElementById('discount-row');
     if (discountAmount > 0) {
         discountRow.classList.remove('hidden');
-        document.getElementById('discount-val').innerText = `- R$ ${discountAmount.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
+        document.getElementById('discount-val').innerText = `- R$ ${formatCurrency(discountAmount)}`;
     } else {
         discountRow.classList.add('hidden');
     }
 
-    document.getElementById('delivery-fee').innerText = deliveryFee === 0 ? "GRÁTIS" : `R$ ${deliveryFee.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
-    document.getElementById('total-price').innerText = `R$ ${total.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
+    document.getElementById('delivery-fee').innerText = deliveryFee === 0 ? "GRÁTIS" : `R$ ${formatCurrency(deliveryFee)}`;
+    document.getElementById('total-price').innerText = `R$ ${formatCurrency(total)}`;
 
-    // REGRA DOS CUPONS DA MOTO ELÉTRICA (R$ 50 = 1 CUPOM)
     const campanhaContainer = document.getElementById('campanha-container');
     const campanhaMsg = document.getElementById('campanha-msg');
     const cuponsGanhos = Math.floor(subtotal / 50);
@@ -572,7 +656,7 @@ function calculateTotals() {
         campanhaContainer.className = "bg-amber-50 border border-amber-300 rounded-xl p-3 text-center transition-all";
         campanhaMsg.innerHTML = "Nas compras a partir de R$ 50,00 você ganha cupons para concorrer a uma <strong>Moto Elétrica!</strong>";
     } else if (cuponsGanhos === 0) {
-        const falta = (50 - subtotal).toLocaleString('pt-br', {minimumFractionDigits: 2});
+        const falta = formatCurrency(50 - subtotal);
         campanhaContainer.className = "bg-orange-50 border border-orange-300 rounded-xl p-3 text-center transition-all";
         campanhaMsg.innerHTML = `Faltam apenas <strong>R$ ${falta}</strong> para você ganhar seu 1º cupom da Moto Elétrica! 🎁`;
     } else {
@@ -582,6 +666,8 @@ function calculateTotals() {
     }
 }
 
+
+
 function sendOrder() {
     const name = document.getElementById('cust-name').value;
     const addr = document.getElementById('cust-address').value;
@@ -589,10 +675,10 @@ function sendOrder() {
     const obs = document.getElementById('cust-obs').value;
     if(!name || !addr || cart.length === 0) return alert("Por favor, preencha nome e endereço!");
     
-    const subtotal = cart.reduce((acc, item) => acc + (item.qty * item.price), 0);
-    const discountAmount = subtotal * currentDiscount;
+    const subtotal = roundToCents(cart.reduce((acc, item) => acc + (item.qty * item.price), 0));
+    const discountAmount = roundToCents(subtotal * currentDiscount);
     const deliveryFee = (subtotal >= 20) ? 0 : 2;
-    const total = subtotal - discountAmount + deliveryFee;
+    const total = roundToCents(subtotal - discountAmount + deliveryFee);
     const cuponsGanhos = Math.floor(subtotal / 50);
 
     let msg = `*NOVO PEDIDO - FARMÁCIA DOS POBRES*\n\n`;
@@ -607,15 +693,15 @@ function sendOrder() {
 
     msg += `\n*ITENS:*\n`;
     cart.forEach(item => {
-        msg += `- ${item.qty}x ${item.name} [REF: ${item.code}] (R$ ${(item.qty * item.price).toLocaleString('pt-br', {minimumFractionDigits: 2})})\n`;
+        msg += `- ${item.qty}x ${item.name} [REF: ${item.code}] (R$ ${formatCurrency(item.qty * item.price)})\n`;
     });
     msg += `\n-------------------\n`;
-    msg += `*Subtotal:* R$ ${subtotal.toLocaleString('pt-br', {minimumFractionDigits: 2})}\n`;
+    msg += `*Subtotal:* R$ ${formatCurrency(subtotal)}\n`;
     if(discountAmount > 0) {
-        msg += `*Desconto Cupom:* - R$ ${discountAmount.toLocaleString('pt-br', {minimumFractionDigits: 2})}\n`;
+        msg += `*Desconto Cupom:* - R$ ${formatCurrency(discountAmount)}\n`;
     }
     msg += `*Entrega:* ${deliveryFee === 0 ? "GRÁTIS" : "R$ 2,00"}\n`;
-    msg += `*TOTAL FINAL: R$ ${total.toLocaleString('pt-br', {minimumFractionDigits: 2})}*`;
+    msg += `*TOTAL FINAL: R$ ${formatCurrency(total)}*`;
     
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
 }
