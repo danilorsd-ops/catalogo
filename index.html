@@ -75,11 +75,6 @@
                        class="w-full p-3 rounded-lg shadow-inner outline-none focus:ring-2 focus:ring-farm-red">
                 <i class="fas fa-search absolute right-4 top-4 text-gray-400" aria-hidden="true"></i>
             </div>
-            <div class="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-white/90">
-                <span>Entrega em Pombal • Frete grátis acima de R$ 20</span>
-                <a href="https://wa.me/5583996901718?text=Olá!%20Preciso%20de%20ajuda%20com%20um%20produto." target="_blank" rel="noopener" class="underline hover:text-white">Consultar pelo WhatsApp</a>
-                <button type="button" onclick="document.getElementById('informacoes-loja').scrollIntoView({behavior:'smooth'})" class="underline hover:text-white">Informações da loja</button>
-            </div>
         </div>
     </header>
 
@@ -115,16 +110,12 @@
                 <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Carregando estoque atualizado...
             </div>
             <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
-            <div id="no-results" class="hidden text-center py-12 text-gray-500">
-                <p class="font-bold text-gray-700">Não encontramos esse produto no catálogo.</p>
-                <p class="text-sm mt-2">O estoque pode mudar. Fale com a equipe para confirmar a disponibilidade.</p>
-                <a href="https://wa.me/5583996901718?text=Olá!%20Não%20encontrei%20um%20produto%20no%20catálogo.%20Podem%20me%20ajudar%3F" target="_blank" rel="noopener" class="inline-block mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold">Consultar pelo WhatsApp</a>
-            </div>
+            <div id="no-results" class="hidden text-center py-12 text-gray-500">Nenhum produto encontrado. Confira a digitação ou tente outro termo.</div>
             <p id="product-count" class="hidden text-center text-xs text-gray-500 mt-4"></p>
             <button id="load-more-products" type="button" onclick="loadMoreProducts()" class="hidden mx-auto mt-3 bg-farm-blue text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90">Carregar mais produtos</button>
         </main>
 
-        <footer id="informacoes-loja" class="bg-white border-t border-gray-200 py-8 mt-12">
+        <footer class="bg-white border-t border-gray-200 py-8 mt-12">
             <div class="container mx-auto px-4 text-center space-y-6">
                 
                 <div class="flex justify-center gap-6 text-2xl">
