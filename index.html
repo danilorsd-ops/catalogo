@@ -259,6 +259,7 @@
         const CODIGOS_PBM = ['3927', '4783', '3132', '5261', '3164', '13812', '14596', '15010', '15784', '26330', '12387', '3701', '14217', '22714', '22176', '23864', '20806', '10640', '11487',
                             '14747', '9570', '8918', '9995', '10148', '16154', '16317', '26727', '21044', '10656', '4988', '6659', '5071', '3234', '5351', '11499', '6396', '10617', '14378', 
                             '14377', '25735', '27810', '14594', '15197', '3518', '8000',];
+        const CODIGOS_BLACKFRIDAY = ['33905', '28240', '35844', '23106', '23105', '25907', '37534', '27500', '22762', '37292', '37294', '37295', '37296', '34946', '32881', '36112', '32462', '32461', '32464', '32463', '37090', '35298', '35297', '35296', '32883', '36149', '33432', '33434', '7020', '4183', '36092', '14274', '37453', '35814', '36610', '35885', '35888', '35896', '35261', '35849', '36071', '36727', '36726', '36725', '36728', '36729', '34590', '35186', '35382', '35853', '35187'];
 
         function escapeHtml(value) {
             return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;")
@@ -467,10 +468,15 @@ function renderProducts(list, reset = true) {
         const safeName = escapeHtml(p.name);
         const imageCode = encodeURIComponent(p.code);
         const isPbm = CODIGOS_PBM.includes(p.code);
+        const isBlackFriday = CODIGOS_BLACKFRIDAY.includes(p.code);
 
         return `
-            <div class="bg-white p-3 rounded-lg shadow-sm border ${isPbm ? 'border-green-400 bg-green-50/20' : 'border-gray-200'} flex flex-col justify-between hover:border-farm-blue transition-all relative">
-                ${isPbm ? `
+            <div class="bg-white p-3 rounded-lg shadow-sm border ${isBlackFriday ? 'border-black bg-gray-50' : isPbm ? 'border-green-400 bg-green-50/20' : 'border-gray-200'} flex flex-col justify-between hover:border-farm-blue transition-all relative">
+                ${isBlackFriday ? `
+                    <span class="absolute top-1 left-1 bg-black text-white font-black text-[7px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm z-10">
+                        BLACKFRIDAY
+                    </span>
+                ` : isPbm ? `
                     <span class="absolute top-1 left-1 bg-green-600 text-white font-black text-[7px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm z-10">
                         <i class="fab fa-whatsapp"></i> Condição Especial / WhatsApp
                     </span>
@@ -483,8 +489,8 @@ function renderProducts(list, reset = true) {
                     <p class="text-farm-blue font-black text-sm mb-2">R$ ${formatCurrency(p.price)}</p>
                 </div>
 
-                <button type="button" data-product-action="add" data-product-code="${safeCode}" class="w-full ${isPbm ? 'bg-green-600 hover:bg-green-700' : 'bg-farm-red'} text-white text-[10px] py-2 rounded font-bold uppercase active:scale-95 transition-all flex items-center justify-center gap-1">
-                    ${isPbm ? '<i class="fab fa-whatsapp text-xs"></i> Consultar PBM' : 'Comprar'}
+                <button type="button" data-product-action="add" data-product-code="${safeCode}" class="w-full ${isBlackFriday ? 'bg-black hover:bg-gray-900' : isPbm ? 'bg-green-600 hover:bg-green-700' : 'bg-farm-red'} text-white text-[10px] py-2 rounded font-bold uppercase active:scale-95 transition-all flex items-center justify-center gap-1">
+                    ${isPbm && !isBlackFriday ? '<i class="fab fa-whatsapp text-xs"></i> Consultar PBM' : 'Comprar'}
                 </button>
             </div>
         `;
